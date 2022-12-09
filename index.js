@@ -32,13 +32,15 @@ const getUrls = async (url) => {
 			scrapedUrls.push(eachScrape)
 		});
 		//build formated array of links
+		//NEED TO FIX FOR DEGREES WITH CONCENTRATIONS
+		//some <li> have <ul> those are the ones with concentrations
 		scrapedUrls = scrapedUrls.filter(url => url != '#header')
 		scrapedUrls = scrapedUrls.filter(url => url != undefined)
-		scrapedUrls = scrapedUrls.map(url => 'http://catalog.illinois.edu' + url + '#degreerequirementstext')
+		scrapedUrls = scrapedUrls.map(url => `'http://catalog.illinois.edu${url}#degreerequirementstext'`)
+console.log(scrapedUrls)
 
-
-		const hey = scrapedUrls.forEach(element => scrape(element))
-		console.log(hey)
+	scrapedUrls.forEach(element => scrape(element))
+		
 
 		//  return scrapedUrls;
 	} catch (error) {
