@@ -2,50 +2,42 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 
-// $('a').attr('href'); // gets the actual value
-// $('a').prop('href')
-
-
 const getUrls = async () => {
 	try {
 		const { data } = await axios.get(
 			'http://catalog.illinois.edu/undergraduate/'
 		);
 		const $ = cheerio.load(data);
-		let scrapedData = [];
+		let scrapedUrls = [];
 		$("div[id='atozindex'] a").each((_idx, el) => {
 			const eachScrape = $(el).attr('href')
-			scrapedData.push(eachScrape)
+			scrapedUrls.push(eachScrape)
 		});
-
-		scrapedData = scrapedData.filter(url => url != '#header')
-		scrapedData = scrapedData.filter(url => url != undefined)
-		// console.log(scrapedData)
-
-
-
-
-		return scrapedData;
+		scrapedUrls = scrapedUrls.filter(url => url != '#header')
+		scrapedUrls = scrapedUrls.filter(url => url != undefined)
+		scrapedUrls = scrapedUrls.map(url => 'http://catalog.illinois.edu'+url+'#degreerequirementstext' )
+		return scrapedUrls;
 	} catch (error) {
 		throw error;
 	}
-
-
 };
 
 getUrls()
-    .then((scrapedData) => console.log(scrapedData));
+    .then((scrapedUrls) => console.log(scrapedUrls));
 
 
 
 
-// const scrape = async () => {
+// const scrape = async (getUrls) => {
 // 	try {
+// 		console.log(getUrls)
 // 		const { data } = await axios.get(
-// 			'http://catalog.illinois.edu/undergraduate/bus/accountancy-bs/#degreerequirementstext'
+
+
+// 		 `http://catalog.illinois.edu${scrapedUrls}#degreerequirementstext`
 // 		);
 // 		const $ = cheerio.load(data);
-// 		const  scrapedData= [];
+// 		const scrapedData = [];
 
 // 		$('.courselistcomment').each((_idx, el) => {
 // 			const eachScrape = $(el).text()
@@ -63,27 +55,5 @@ getUrls()
 
 
 
-	//written by openAI
-
-// // async function scrapeData() {
-// //   const urls = ["http://catalog.illinois.edu/undergraduate/bus"];
-// //   const promises = urls.map(async url => {
-// //     try {
-// //       const response = await axios.get(url);
-// //       const html = response.data;
-// //       const cssQuery = ".courselistcomment";
-// //       const cheerio = require("cheerio");
-// //       const $ = cheerio.load(html);
-// //       const data = $(cssQuery).text();
-// //       return data;
-// //     } catch (err) {
-// //       console.error(err);
-// //     }
-// //   });
-// //   const results = await Promise.all(promises);
-// //   console.log(results);
-// // }
-
-// // scrapeData();
 
 
