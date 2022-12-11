@@ -1,5 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs')
+
+
 
 
 
@@ -11,21 +14,32 @@ const selectEach = "div[id='atozindex'] li"
 
 
 
-// const scrape = async (url) => {
-// 	console.log(url)
-// 	try {
-// 		const { data } = await axios.get(url)
-// 		const $ = cheerio.load(data)
-// 		const scrapedData = []
-// 		$(node).each((_idx, el) => {
-// 			const eachScrape = $(el).text()
-// 			scrapedData.push(eachScrape)
-// 		});
-// 		console.log(scrapedData)
-// 	} catch (error) {
-// 		// throw error;
-// 	}
-// };
+const scrape = async (url) => {
+	try {
+		const { data } = await axios.get(url)
+		const $ = cheerio.load(data)
+		const scrapedData = []
+		$(node).each((_idx, el) => {
+			const eachScrape = $(el).text()
+			scrapedData.push(eachScrape)
+		});
+
+		fs.writeFile('scraper/requirements.csv', scrapedData, 'utf8', function (err) {
+			if (err) {
+			  console.log('Some error occured - file either not saved or corrupted file saved.');
+			} else{
+			  console.log('It\'s saved!');
+			}
+		  });
+
+		// const csv = scrapedData.toString()
+		// document.write(csv)
+
+		// console.dir(scrapedData, {'maxArrayLength': null})
+	} catch (error) {
+		// throw error;
+	}
+};
 
 
 const getUrls = async (url) => {
@@ -34,8 +48,9 @@ const getUrls = async (url) => {
 		//get parent url links
 		const { data } = await axios.get(url)
 		const $ = cheerio.load(data)
-
 		let scrapedUrls = []
+
+
 		$(selectEach).each((_idx, el) => {
 			//getting the nested majors
 			if (el.children.length > 1) {
@@ -43,6 +58,7 @@ const getUrls = async (url) => {
 				const subUl = liChildren.find((child) => {
 					return child.name === 'ul'
 				})
+
 				$(subUl).children().each(function () {
 					const li = $(this)
 					li.children().each(function () {
@@ -51,33 +67,26 @@ const getUrls = async (url) => {
 					})
 				})
 			}
-			else{
-				const eachScrape = $(el).attr('href')
-			scrapedUrls.push(eachScrape)
+
+			else {
+				const eachScrape = $(el).children().attr('href')
+				scrapedUrls.push(eachScrape)
 			}
 		});
-
-		scrapedUrls = scrapedUrls.filter(url => url != '#header')
-		scrapedUrls = scrapedUrls.filter(url => url != undefined)
-
-		console.log(scrapedUrls)
-		//build formated array of links
-		//NEED TO FIX FOR DEGREES WITH CONCENTRATIONS
-		//some <li> have <ul> those are the ones with concentrations
-
 		
-		// let sliced = scrapedUrls.slice(0, 4)
-		// // console.log(sliced)
+		
+		//build formated array of links
+		scrapedUrls = [...new Set(scrapedUrls)];
+		scrapedUrls = scrapedUrls.filter(url => url != '#header')
+		scrapedUrls = scrapedUrls.filter(url => url != '#S')
+		scrapedUrls = scrapedUrls.filter(url => url != '/graduate/media/journalism-bs-mj/')
+		scrapedUrls = scrapedUrls.map(url => `http://catalog.illinois.edu${url}#degreerequirementstext`)	
 
-		// scrapedUrls = sliced.map(url => `http://catalog.illinois.edu${url}#degreerequirementstext`)
-		// // console.log(scrapedUrls)
+		// console.dir(scrapedUrls, {'maxArrayLength': null})
+		// console.log(scrapedUrls.length)
 
-		// // scrapedUrls.forEach(element => scrape(element))
-		// for (const url of scrapedUrls) {
-		// 	await scrape(url)
-		// }
+	scrapedUrls.forEach(element => scrape(element))
 
-		//  return scrapedUrls;
 	} catch (error) {
 		// throw error;
 	}
