@@ -24,18 +24,8 @@ const scrape = async (url) => {
 			scrapedData.push(eachScrape)
 		});
 
-		fs.writeFile('scraper/requirements.csv', scrapedData, 'utf8', function (err) {
-			if (err) {
-			  console.log('Some error occured - file either not saved or corrupted file saved.');
-			} else{
-			  console.log('It\'s saved!');
-			}
-		  });
 
-		// const csv = scrapedData.toString()
-		// document.write(csv)
-
-		// console.dir(scrapedData, {'maxArrayLength': null})
+		console.dir(scrapedData, {'maxArrayLength': null})
 	} catch (error) {
 		// throw error;
 	}
